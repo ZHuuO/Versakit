@@ -11,15 +11,17 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
         node-version: '20'  # 设置Node.js版本
 
-    - name: Install pnpm
-      run: npm install -g pnpm@9
+    - name: Setup pnpm (if used)
+      uses: pnpm/action-setup@v3 # 如果使用 pnpm，请取消此区域注释
+      with:
+        version: 9
 
     - name: Install dependencies
       run: pnpm install
@@ -28,7 +30,7 @@ jobs:
       run: pnpm run docs:build  # 使用VitePress构建文档
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: docs-build
         path: ./docs/.vitepress/dist
@@ -39,10 +41,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: docs-build
         path: ./docs/.vitepress/dist
