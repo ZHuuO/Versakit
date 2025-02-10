@@ -1,72 +1,54 @@
-# 构建 VitePress 站点并将其部署到 GitHub Pages 的示例工作流程
-
-name: Deploy VitePress site to Pages
+name: Deploy to GitHub Pages
 
 on:
-  # 在针对 `main` 分支的推送上运行。如果你
-  # 使用 `master` 分支作为默认分支，请将其更改为 `master`
   push:
-    branches: [main]
-
-  # 允许你从 Actions 选项卡手动运行此工作流程
-  workflow_dispatch:
-
-# 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# 只允许同时进行一次部署，跳过正在运行和最新队列之间的运行队列
-# 但是，不要取消正在进行的运行，因为我们希望允许这些生产部署完成
-concurrency:
-  group: pages
-  cancel-in-progress: false
+    branches:
+      - main  # 监听main分支的push事件
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '20' # 设置Node.js版本
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'  # 设置Node.js版本
 
-      - name: Install pnpm
-        run: npm install -g pnpm@9
+    - name: Install pnpm
+      run: npm install -g pnpm@9
 
-      - name: Install dependencies
-        run: pnpm install
+    - name: Install dependencies
+      run: pnpm install
 
-      - name: Build project
-        run: pnpm run docs:build # 使用VitePress构建文档
+    - name: Build project
+      run: pnpm run docs:build  # 使用VitePress构建文档
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: docs-build
-          path: ./docs/.vitepress/dist
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: docs-build
+        path: ./docs/.vitepress/dist
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: docs-build
-          path: ./docs/.vitepress/dist
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: docs-build
+        path: ./docs/.vitepress/dist
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/.vitepress/dist # VitePress构建输出目录
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/.vitepress/dist  # VitePress构建输出目录
