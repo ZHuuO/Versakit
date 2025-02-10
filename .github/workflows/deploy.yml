@@ -2,8 +2,10 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main  # 监听main分支的push事件
+    branches: [main]
+  
+  # 允许你从 Actions 选项卡手动运行此工作流程
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,7 +26,7 @@ jobs:
         node-version: 20
 
     - name: Install dependencies
-      run: pnpm i --frozen-lockfile
+      run: pnpm i --no-frozen-lockfile
 
     - name: Build project
       run: pnpm run docs:build  # 使用VitePress构建文档
